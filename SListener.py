@@ -4,26 +4,32 @@ import time
 import sys
 
 class SListener(StreamListener):
-    def __init__(self, api = None, fprefix = 'streamer'):
+    def __init__(self, api = None, fprefix = 'streamer', time_limit=60):
         self.api = api or API()
         self.counter = 0
         self.fprefix = fprefix
-        self.output  = open('%s_%s.json' % (self.fprefix, time.strftime('%Y%m%d-%H%M%S')), 'w')
+        self.output  = open('%s_%s.json' % (self.fprefix, time.strftime('%Y%m%d-%H%M%S')), 'w+')
+        self.start_time = time.time()
+        self.limit = time_limit
 
     def on_data(self, data):
-        if  'in_reply_to_status' in data:
-            self.on_status(data)
-        elif 'delete' in data:
-            delete = json.loads(data)['delete']['status']
-            if self.on_delete(delete['id'], delete['user_id']) is False:
-                return False
-        elif 'limit' in data:
-            if self.on_limit(json.loads(data)['limit']['track']) is False:
-                return False
-        elif 'warning' in data:
-            warning = json.loads(data)['warnings']
-            print("WARNING: %s" % warning['message'])
-            return
+        if (time.time() - self.start_time) < self.limit:
+            if  'in_reply_to_status' in data:
+                self.on_status(data)
+            elif 'delete' in data:
+                delete = json.loads(data)['delete']['status']
+                if self.on_delete(delete['id'], delete['user_id']) is False:
+                    return False
+            elif 'limit' in data:
+                if self.on_limit(json.loads(data)['limit']['track']) is False:
+                    return False
+            elif 'warning' in data:
+                warning = json.loads(data)['warnings']
+                print("WARNING: %s" % warning['message'])
+                return
+        else:
+            self.output.close()
+            return False
 
     def on_status(self, status):
         self.output.write(status)
