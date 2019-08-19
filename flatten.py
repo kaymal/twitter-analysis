@@ -52,7 +52,11 @@ def flatten(json_file):
   
                 # Save the extended quoted tweet text
                 tweet_obj['quoted_status-extended_tweet-full_text'] = tweet_obj['quoted_status']['extended_tweet']['full_text']
- 
+        
+        if 'location' in tweet_obj['user']:
+            # Save the user location
+            tweet_obj['user-location'] = tweet_obj['user']['location']
+
         tweets_list.append(tweet_obj)
         
     return tweets_list
