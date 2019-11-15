@@ -1,4 +1,4 @@
-# Analyzing Twitter Data in Python
+# Streaming and Analyzing Twitter Data in Python
 
 Outline:
 
@@ -6,4 +6,6 @@ Outline:
 - Collecting and Streaming Data
 - Loading Tweets
 - Analyzing Data
+- Modeling
+- Topic Identification
 
